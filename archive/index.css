@@ -1,0 +1,39 @@
+/* <!-- <body style="display: flex; margin: 0"></body> --> */
+/* <!-- <body class="flex m-0"></body> --> */
+
+body {
+  margin: 0;
+  display: flex;
+}
+
+/* --- */
+
+.m-0 {
+  margin: 0;
+}
+
+.flex {
+  display: flex;
+}
+
+/* --- */
+
+.bg-white {
+  background-color: #ffffff;
+}
+
+.bg-neutral-900 {
+  background-color: #171717;
+}
+
+.bg-black {
+  background-color: #000000;
+}
+
+.p-0 {
+  padding: 0;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}

@@ -32,7 +32,7 @@ type ArchetypesData = {
 abstract class ArchetypesClass {
   private static archetypes: ArchetypesData
 
-  public static setArchetypes(archetypes: any) {
+  public static setArchetypes(archetypes: ArchetypesData) {
     this.archetypes = archetypes
   }
 
@@ -176,7 +176,10 @@ abstract class ArchetypesClass {
     }
   }
 
-  public static updateBorderForce(positions: any, moments: any) {
+  public static updateBorderForce(
+    positions: { x: number; y: number }[],
+    moments: { x: number; y: number }[]
+  ) {
     const force = 1.5
     const n = moments.length // positions moments
     for (let i = 0; i < n; i++) {

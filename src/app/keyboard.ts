@@ -1,3 +1,5 @@
+type Controls = { up: boolean; down: boolean; left: boolean; right: boolean }
+
 export abstract class Keyboard {
   private static keys: Record<string, boolean> = {}
 
@@ -9,7 +11,7 @@ export abstract class Keyboard {
     right: boolean
   }[]
 
-  public static setEntity(entity: any) {
+  public static setEntity(entity: Controls[]) {
     Keyboard.playersControls = entity
   }
 

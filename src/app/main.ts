@@ -43,7 +43,7 @@ function main() {
   Archetypes.setArchetypes(archetypes)
   Archetypes.loadArchetypes()
 
-  const entities: [any[], any[]] = [[], []]
+  const entities: [unknown[], unknown[]] = [[], []]
   Entities.setEntities(entities)
   // Entities.load()
 
@@ -67,7 +67,18 @@ function main() {
   globalThis.addEventListener('keyup', Keyboard.keyup)
 
   Canvas.resizeToScreen()
-  globalThis.addEventListener('resize', Canvas.resize)
+
+  globalThis.addEventListener('resize', (ev: UIEvent) => {
+    Canvas.resizeToScreen()
+  })
+
+  globalThis.visualViewport!.addEventListener('resize', (ev: Event) => {
+    // Canvas.resizeToScreen()
+  })
+
+  globalThis.visualViewport!.addEventListener('scroll', (ev: Event) => {
+    Canvas.resizeToScreen()
+  })
 
   const update = () => {
     // console.log(player)
@@ -75,11 +86,12 @@ function main() {
 
     // Entities.update()
     Archetypes.updateAll()
-    Renderer.animate()
+    Renderer.animate() // <--- shapes borders don't collide ! only inside circle
   }
   Animator.setAnimate(update)
   globalThis.requestAnimationFrame(Animator.animate)
 
+  // Append canvas to id=app rather than body ?
   globalThis.document.body.appendChild(canvas)
 
   function beforeunload(e: BeforeUnloadEvent) {

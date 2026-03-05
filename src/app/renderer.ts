@@ -24,31 +24,31 @@ abstract class Renderer {
     this.ctx = ctx
   }
 
-  public static setEntities(entities: any[][]) {
-    // this.entities = entities
-  }
+  // public static setEntities(entities: unknown[][]) {
+  //   // this.entities = entities
+  // }
 
   public static setArchetypes(archetypes: ArchetypesData) {
     Renderer.archetypes = archetypes
   }
 
-  public static initContext() {
-    const width = globalThis.innerWidth
-    const height = globalThis.innerHeight
+  // public static initContext() {
+  //   const width = globalThis.innerWidth
+  //   const height = globalThis.innerHeight
 
-    // Downscale (support for retina resolution)
-    // 1. Multiply the canvas's width and height by the devicePixelRatio
-    const ratio = globalThis.devicePixelRatio || 1
-    this.ctx.canvas.width = width * ratio
-    this.ctx.canvas.height = height * ratio
+  //   // Downscale (support for retina resolution)
+  //   // 1. Multiply the canvas's width and height by the devicePixelRatio
+  //   const ratio = globalThis.devicePixelRatio || 1
+  //   this.ctx.canvas.width = width * ratio
+  //   this.ctx.canvas.height = height * ratio
 
-    // 2. Force it to display at the original (logical) size with CSS or style attributes
-    this.ctx.canvas.style.width = width + 'px'
-    this.ctx.canvas.style.height = height + 'px'
+  //   // 2. Force it to display at the original (logical) size with CSS or style attributes
+  //   this.ctx.canvas.style.width = width + 'px'
+  //   this.ctx.canvas.style.height = height + 'px'
 
-    // 3. Scale the context so you can draw on it without considering the ratio.
-    this.ctx.scale(ratio, ratio)
-  }
+  //   // 3. Scale the context so you can draw on it without considering the ratio.
+  //   this.ctx.scale(ratio, ratio)
+  // }
 
   public static animate() {
     const ctx = this.ctx

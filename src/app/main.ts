@@ -54,7 +54,6 @@ function main() {
 
   const canvas = globalThis.document.createElement('canvas')
   Canvas.set(canvas)
-  Canvas.initCanvas()
 
   const ctx = canvas.getContext('2d')!
   Renderer.setContext(ctx)

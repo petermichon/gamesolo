@@ -15,43 +15,22 @@ type ArchetypesData = {
   }
 }
 
-abstract class Renderer {
-  private static ctx: CanvasRenderingContext2D
-  // private static entities: any[][]
-  private static archetypes: ArchetypesData
+export class Renderer {
+  private ctx: CanvasRenderingContext2D
 
-  public static setContext(ctx: CanvasRenderingContext2D) {
+  private archetypes: ArchetypesData
+
+  public constructor(
+    ctx: CanvasRenderingContext2D,
+    archetypes: ArchetypesData
+  ) {
     this.ctx = ctx
+    this.archetypes = archetypes
   }
 
-  // public static setEntities(entities: unknown[][]) {
-  //   // this.entities = entities
-  // }
-
-  public static setArchetypes(archetypes: ArchetypesData) {
-    Renderer.archetypes = archetypes
-  }
-
-  // public static initContext() {
-  //   const width = globalThis.innerWidth
-  //   const height = globalThis.innerHeight
-
-  //   // Downscale (support for retina resolution)
-  //   // 1. Multiply the canvas's width and height by the devicePixelRatio
-  //   const ratio = globalThis.devicePixelRatio || 1
-  //   this.ctx.canvas.width = width * ratio
-  //   this.ctx.canvas.height = height * ratio
-
-  //   // 2. Force it to display at the original (logical) size with CSS or style attributes
-  //   this.ctx.canvas.style.width = width + 'px'
-  //   this.ctx.canvas.style.height = height + 'px'
-
-  //   // 3. Scale the context so you can draw on it without considering the ratio.
-  //   this.ctx.scale(ratio, ratio)
-  // }
-
-  public static animate() {
+  public animate() {
     const ctx = this.ctx
+    const archetypes = this.archetypes
 
     // ---
 
@@ -89,7 +68,7 @@ abstract class Renderer {
 
     // ---
 
-    this.ctx.globalAlpha = 1.0
+    ctx.globalAlpha = 1.0
 
     // Background
     ctx.fillStyle = '#c6c6c6' // #cccccc #cdbdbd #ebebe1
@@ -104,7 +83,7 @@ abstract class Renderer {
 
     ctx.fillStyle = '#06b2e1' // #f04f55 #717173 #000000
     ctx.strokeStyle = '#0385a8' // #b33d41 #535354
-    this.ctx.globalAlpha = 0.125 // 0.0 0.125
+    ctx.globalAlpha = 0.125 // 0.0 0.125
     // for (const entity of Renderer.ghosts[0]) {
     //   // ---
     //   // CALCULATE GRAPHICS
@@ -120,24 +99,24 @@ abstract class Renderer {
 
     ctx.fillStyle = '#999999'
     ctx.strokeStyle = '#727272'
-    this.ctx.globalAlpha = 0.125 // 0.0 0.125
+    ctx.globalAlpha = 0.125 // 0.0 0.125
 
     ctx.fillStyle = '#06b2e1' // #f04f55 #717173 #000000
     ctx.strokeStyle = '#0385a8' // #b33d41 #535354
-    this.ctx.globalAlpha = 1.0
+    ctx.globalAlpha = 1.0
     // for (const entity of this.entities[0]) {
-    for (let i = 0; i < Renderer.archetypes.players.position.length; i++) {
+    for (let i = 0; i < archetypes.players.position.length; i++) {
       // console.log(Renderer.archetypes.players.position[i])
       // console.log(Renderer.archetypes.players.radius[i])
 
       // ---
       // CALCULATE GRAPHICS
 
-      const x = vRCanvasX + Renderer.archetypes.players.position[i].x / wScale
-      const y = vRCanvasY + Renderer.archetypes.players.position[i].y / wScale
+      const x = vRCanvasX + archetypes.players.position[i].x / wScale
+      const y = vRCanvasY + archetypes.players.position[i].y / wScale
       // const x = Math.round(entity.position.x)
       // const y = Math.round(entity.position.y)
-      const radius = Renderer.archetypes.players.radius[i] / wScale
+      const radius = archetypes.players.radius[i] / wScale
 
       this.drawCircle(x, y, radius)
     }
@@ -149,48 +128,30 @@ abstract class Renderer {
 
     ctx.fillStyle = '#999999'
     ctx.strokeStyle = '#727272'
-    this.ctx.globalAlpha = 1.0
+    ctx.globalAlpha = 1.0
 
-    for (let i = 0; i < Renderer.archetypes.rocks.position.length; i++) {
+    for (let i = 0; i < archetypes.rocks.position.length; i++) {
       // ---
       // CALCULATE GRAPHICS
 
-      const x = vRCanvasX + Renderer.archetypes.rocks.position[i].x / wScale
-      const y = vRCanvasY + Renderer.archetypes.rocks.position[i].y / wScale
+      const x = vRCanvasX + archetypes.rocks.position[i].x / wScale
+      const y = vRCanvasY + archetypes.rocks.position[i].y / wScale
       // const x = Math.round(entity.position.x)
       // const y = Math.round(entity.position.y)
-      const radius = Renderer.archetypes.rocks.radius[i] / wScale
+      const radius = archetypes.rocks.radius[i] / wScale
 
       // this.ctx.fillRect(x, y, radius, radius)
       this.drawCircle(x, y, radius)
     }
   }
 
-  public static drawCircle(x: number, y: number, radius: number) {
-    this.ctx.beginPath()
-    this.ctx.arc(x, y, radius, 0, 2 * Math.PI)
-    this.ctx.fill()
-    this.ctx.stroke()
-    this.ctx.closePath()
+  public drawCircle(x: number, y: number, radius: number) {
+    const ctx = this.ctx
+
+    ctx.beginPath()
+    ctx.arc(x, y, radius, 0, 2 * Math.PI)
+    ctx.fill()
+    ctx.stroke()
+    ctx.closePath()
   }
 }
-
-function checkIfOutside(
-  entityX: number,
-  entityY: number,
-  entityRadius: number,
-  canvasX: number,
-  canvasY: number,
-  canvasW: number,
-  canvasH: number
-): boolean {
-  const left = entityX + entityRadius < canvasX
-  const right = entityX - entityRadius > canvasX + canvasW
-  const up = entityY + entityRadius < canvasY
-  const down = entityY - entityRadius > canvasY + canvasH
-
-  const isOutside = up || left || down || right
-  return isOutside
-}
-
-export { Renderer }

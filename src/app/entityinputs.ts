@@ -5,9 +5,9 @@ export class EntityInputs {
 
   private playersControls: Controls[] // Write
 
-  constructor(playersControls: Controls[], keys: Record<string, boolean>) {
-    this.playersControls = playersControls
+  constructor(keys: Record<string, boolean>, playersControls: Controls[]) {
     this.keys = keys
+    this.playersControls = playersControls
   }
 
   public update() {

@@ -1,11 +1,11 @@
-export abstract class Keyboard {
-  private static keys: Record<string, boolean> // Write
+export class Keyboard {
+  private keys: Record<string, boolean> // Write
 
-  public static setEntity(keys: Record<string, boolean>) {
-    Keyboard.keys = keys
+  public constructor(keys: Record<string, boolean>) {
+    this.keys = keys
   }
 
-  public static keydown(e: KeyboardEvent) {
+  public keydown(e: KeyboardEvent) {
     if (e.repeat) {
       return
     }
@@ -16,10 +16,10 @@ export abstract class Keyboard {
 
     // ---
 
-    Keyboard.keys[e.code] = true
+    this.keys[e.code] = true
   }
 
-  public static keyup(e: KeyboardEvent) {
-    Keyboard.keys[e.code] = false
+  public keyup(e: KeyboardEvent) {
+    this.keys[e.code] = false
   }
 }

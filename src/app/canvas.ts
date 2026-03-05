@@ -1,14 +1,16 @@
-abstract class Canvas {
-  private static canvas: HTMLCanvasElement
+export class Canvas {
+  private canvas: HTMLCanvasElement /*write*/
 
-  public static set(canvas: HTMLCanvasElement) {
+  public constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas
   }
 
   // Works very well but seems to stretch pixels for weird pixelSize values
-  public static resizeToScreen() {
-    const vp = globalThis.visualViewport!
-    const ratio = globalThis.devicePixelRatio
+  public resizeToScreen() {
+    const vp = globalThis.visualViewport! /*read*/
+    const ratio = globalThis.devicePixelRatio /*read*/
+
+    // ---
 
     // Settings
     const pixelSize = 1.0
@@ -29,8 +31,6 @@ abstract class Canvas {
     this.canvas.style.width = `${styleWidth}px`
     this.canvas.style.height = `${styleHeight}px`
 
-    console.log(vp.scale)
+    // console.log(vp.scale)
   }
 }
-
-export { Canvas }

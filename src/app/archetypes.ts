@@ -29,14 +29,14 @@ type ArchetypesData = {
 }
 
 // Split this class in multiple classes for each archetype ?
-abstract class ArchetypesClass {
-  private static archetypes: ArchetypesData
+export class ArchetypesClass {
+  private archetypes: ArchetypesData
 
-  public static setArchetypes(archetypes: ArchetypesData) {
+  public constructor(archetypes: ArchetypesData) {
     this.archetypes = archetypes
   }
 
-  public static loadArchetypes() {
+  public loadArchetypes() {
     for (let i = 0; i < 1; i++) {
       this.archetypes.players.controls[i] = {
         up: false,
@@ -70,14 +70,14 @@ abstract class ArchetypesClass {
     }
   }
 
-  public static updateAll() {
-    ArchetypesClass.updateControllable(
+  public updateAll() {
+    this.updateControllable(
       this.archetypes.players.controls,
       this.archetypes.players.moment,
       this.archetypes.players.speed
     )
 
-    ArchetypesClass.updatePushable({
+    this.updatePushable({
       moment: [
         ...this.archetypes.players.moment,
         ...this.archetypes.rocks.moment,
@@ -92,7 +92,7 @@ abstract class ArchetypesClass {
       ],
     })
 
-    ArchetypesClass.updateBorderForce(
+    this.updateBorderForce(
       [...this.archetypes.players.position, ...this.archetypes.rocks.position],
       [...this.archetypes.players.moment, ...this.archetypes.rocks.moment]
     )
@@ -106,10 +106,10 @@ abstract class ArchetypesClass {
     //   [...this.archetypes.players.position, ...this.archetypes.rocks.position]
     // )
 
-    ArchetypesClass.updateMoment()
+    this.updateMoment()
   }
 
-  public static updateControllable(
+  public updateControllable(
     controls: { up: boolean; left: boolean; down: boolean; right: boolean }[],
     moments: { x: number; y: number }[],
     speeds: number[]
@@ -136,7 +136,7 @@ abstract class ArchetypesClass {
     }
   }
 
-  public static updatePushable(e: Pushables) {
+  public updatePushable(e: Pushables) {
     const n = e.radius.length // moment position radius
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
@@ -176,7 +176,7 @@ abstract class ArchetypesClass {
     }
   }
 
-  public static updateBorderForce(
+  public updateBorderForce(
     positions: { x: number; y: number }[],
     moments: { x: number; y: number }[]
   ) {
@@ -198,17 +198,16 @@ abstract class ArchetypesClass {
     }
   }
 
-  public static updateMoment() {
-    const positions = ArchetypesClass.archetypes.players.position.concat(
-      ArchetypesClass.archetypes.rocks.position
+  public updateMoment() {
+    const positions = this.archetypes.players.position.concat(
+      this.archetypes.rocks.position
     )
-    const moments = ArchetypesClass.archetypes.players.moment.concat(
-      ArchetypesClass.archetypes.rocks.moment
+    const moments = this.archetypes.players.moment.concat(
+      this.archetypes.rocks.moment
     )
-    const decelerations =
-      ArchetypesClass.archetypes.players.deceleration.concat(
-        ArchetypesClass.archetypes.rocks.deceleration
-      )
+    const decelerations = this.archetypes.players.deceleration.concat(
+      this.archetypes.rocks.deceleration
+    )
     const n = positions.length // decelerations moments positions
     for (let i = 0; i < n; i++) {
       positions[i].x += moments[i].x
@@ -239,5 +238,3 @@ abstract class ArchetypesClass {
   //   }
   // }
 }
-
-export { ArchetypesClass as Archetypes }

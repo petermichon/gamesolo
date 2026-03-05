@@ -2,7 +2,7 @@ import { Keyboard } from './keyboard.ts'
 import { Canvas } from './canvas.ts'
 import { Renderer } from './renderer.ts'
 import { Animator } from './animator.ts'
-import { Archetypes } from './archetypes.ts'
+import { ArchetypesClass } from './archetypes.ts'
 import { EntityInputs } from './entityinputs.ts'
 
 type ArchetypesData = {
@@ -48,35 +48,34 @@ export function main() {
   // ---
 
   const players = archetypes.players.controls
-  const entityInput = new EntityInputs(players, keys)
+  const entityInput = new EntityInputs(keys /*read*/, players /*write*/)
 
-  Archetypes.setArchetypes(archetypes) // Decompose archetypes
+  const archetypesObj = new ArchetypesClass(archetypes) // Decompose archetypes
 
-  Keyboard.setEntity(keys)
+  const keyboard = new Keyboard(keys)
 
-  Canvas.set(canvas)
+  const canvasObj = new Canvas(canvas /*write*/)
 
-  Renderer.setContext(ctx)
-  Renderer.setArchetypes(archetypes)
+  const renderer = new Renderer(ctx, archetypes)
 
   // ---
 
-  Archetypes.loadArchetypes()
+  archetypesObj.loadArchetypes()
 
   globalThis.addEventListener('keydown', (ev: KeyboardEvent) => {
-    Keyboard.keydown(ev)
+    keyboard.keydown(ev)
   })
 
   globalThis.addEventListener('keyup', (ev: KeyboardEvent) => {
-    Keyboard.keyup(ev)
+    keyboard.keyup(ev)
   })
 
   // ---
 
-  Canvas.resizeToScreen()
+  canvasObj.resizeToScreen()
 
   globalThis.addEventListener('resize', (ev: UIEvent) => {
-    Canvas.resizeToScreen()
+    canvasObj.resizeToScreen()
   })
 
   globalThis.visualViewport!.addEventListener('resize', (ev: Event) => {
@@ -84,18 +83,20 @@ export function main() {
   })
 
   globalThis.visualViewport!.addEventListener('scroll', (ev: Event) => {
-    Canvas.resizeToScreen()
+    canvasObj.resizeToScreen()
   })
 
   const update = () => {
     // ---
     entityInput.update()
-    Archetypes.updateAll() // Decompose archetypes
+    archetypesObj.updateAll() // Decompose archetypes
     // ---
-    Renderer.animate() // <--- shapes borders don't collide ! only inside circle
+    renderer.animate() // <--- shapes borders don't collide ! only inside circle
   }
-  Animator.setAnimate(update)
-  globalThis.requestAnimationFrame(Animator.animate)
+  const animator = new Animator(update)
+  globalThis.requestAnimationFrame((time: DOMHighResTimeStamp) => {
+    animator.animate(time)
+  })
 
   // Append canvas to id=app rather than body ?
   globalThis.document.body.appendChild(canvas)

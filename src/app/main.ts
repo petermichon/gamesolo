@@ -1,4 +1,3 @@
-import { Entities } from './entities.ts'
 import { Keyboard } from './keyboard.ts'
 import { Canvas } from './canvas.ts'
 import { Renderer } from './renderer.ts'
@@ -42,10 +41,6 @@ function main() {
 
   Archetypes.setArchetypes(archetypes)
   Archetypes.loadArchetypes()
-
-  const entities: [unknown[], unknown[]] = [[], []]
-  Entities.setEntities(entities)
-  // Entities.load()
 
   // const player = entities[0][0]
   const playersControls = archetypes.players.controls

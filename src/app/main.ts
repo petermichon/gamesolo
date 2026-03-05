@@ -3,6 +3,7 @@ import { Canvas } from './canvas.ts'
 import { Renderer } from './renderer.ts'
 import { Animator } from './animator.ts'
 import { Archetypes } from './archetypes.ts'
+import { EntityInputs } from './entityinputs.ts'
 
 type ArchetypesData = {
   players: {
@@ -21,7 +22,7 @@ type ArchetypesData = {
   }
 }
 
-function main() {
+export function main() {
   const archetypes: ArchetypesData = {
     players: {
       controls: [],
@@ -39,26 +40,38 @@ function main() {
     },
   }
 
-  Archetypes.setArchetypes(archetypes)
-  Archetypes.loadArchetypes()
-
-  // const player = entities[0][0]
-  const playersControls = archetypes.players.controls
-  // const player = archetypes.players.controls // Prefer this
-  Keyboard.setEntity(playersControls)
+  const keys: Record<string, boolean> = {}
 
   const canvas = globalThis.document.createElement('canvas')
+  const ctx = canvas.getContext('2d')!
+
+  // ---
+
+  const players = archetypes.players.controls
+  const entityInput = new EntityInputs(players, keys)
+
+  Archetypes.setArchetypes(archetypes) // Decompose archetypes
+
+  Keyboard.setEntity(keys)
+
   Canvas.set(canvas)
 
-  const ctx = canvas.getContext('2d')!
   Renderer.setContext(ctx)
-  // Renderer.setEntities(entities)
   Renderer.setArchetypes(archetypes)
 
-  // const keydown = () => {}
+  // ---
 
-  globalThis.addEventListener('keydown', Keyboard.keydown)
-  globalThis.addEventListener('keyup', Keyboard.keyup)
+  Archetypes.loadArchetypes()
+
+  globalThis.addEventListener('keydown', (ev: KeyboardEvent) => {
+    Keyboard.keydown(ev)
+  })
+
+  globalThis.addEventListener('keyup', (ev: KeyboardEvent) => {
+    Keyboard.keyup(ev)
+  })
+
+  // ---
 
   Canvas.resizeToScreen()
 
@@ -75,11 +88,10 @@ function main() {
   })
 
   const update = () => {
-    // console.log(player)
-    // console.log(archetypes.players.position[0])
-
-    // Entities.update()
-    Archetypes.updateAll()
+    // ---
+    entityInput.update()
+    Archetypes.updateAll() // Decompose archetypes
+    // ---
     Renderer.animate() // <--- shapes borders don't collide ! only inside circle
   }
   Animator.setAnimate(update)
@@ -104,5 +116,3 @@ function main() {
   }
   globalThis.addEventListener('wheel', wheel, { passive: false })
 }
-
-export { main }

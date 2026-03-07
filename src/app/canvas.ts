@@ -30,7 +30,5 @@ export class Canvas {
     this.canvas.height = canvasHeight // - vp.pageTop
     this.canvas.style.width = `${styleWidth}px`
     this.canvas.style.height = `${styleHeight}px`
-
-    // console.log(vp.scale)
   }
 }

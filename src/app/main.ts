@@ -2,8 +2,13 @@ import { Keyboard } from './keyboard.ts'
 import { Canvas } from './canvas.ts'
 import { Renderer } from './renderer.ts'
 import { Animator } from './animator.ts'
-import { ArchetypesClass } from './archetypes.ts'
 import { EntityInputs } from './entityinputs.ts'
+import { ControllableArch } from './controllablearch.ts'
+import { PushableArch } from './pushablearch.ts'
+import { BorderForce } from './borderforce.ts'
+import { MomentArch } from './momentarch.ts'
+import { PlayersLoader } from './playersloader.ts'
+import { RocksLoader } from './rocksloader.ts'
 
 type ArchetypesData = {
   players: {
@@ -47,12 +52,50 @@ export function main() {
 
   // ---
 
-  const players = archetypes.players.controls
-  const entityInput = new EntityInputs(keys /*read*/, players /*write*/)
+  const entityInput = new EntityInputs(
+    keys /*read*/,
+    archetypes.players.controls /*write*/
+  )
 
-  const archetypesObj = new ArchetypesClass(archetypes) // Decompose archetypes
+  const controllablesObj = new ControllableArch(
+    archetypes.players.controls /*read*/,
+    archetypes.players.moment /*~read write*/,
+    archetypes.players.speed /*read*/
+  )
 
-  const keyboard = new Keyboard(keys)
+  const pushablesOjb = new PushableArch(
+    archetypes.players.moment /*~read write*/,
+    archetypes.players.position /*read*/,
+    archetypes.players.radius /*read*/,
+    archetypes.rocks.moment /*~read write*/,
+    archetypes.rocks.position /*read*/,
+    archetypes.rocks.radius /*read*/
+  )
+
+  const borderForcer = new BorderForce(
+    archetypes.players.position /*read*/,
+    archetypes.rocks.position /*read*/,
+    archetypes.players.moment /*~read write*/,
+    archetypes.rocks.moment /*~read write*/
+  )
+
+  const momentObj = new MomentArch(
+    archetypes.players.position /*read*/,
+    archetypes.players.moment /*~read write*/,
+    archetypes.players.deceleration /*read*/,
+    archetypes.rocks.position /*read*/,
+    archetypes.rocks.moment /*~read write*/,
+    archetypes.rocks.deceleration /*read*/
+  )
+
+  const playersLoader = new PlayersLoader(archetypes.players /*write*/)
+  const rocksLoader = new RocksLoader(archetypes.rocks /*write*/)
+
+  // const archetypesObj = new ArchetypesClass(archetypes) // Decompose archetypes
+
+  // ---
+
+  const keyboard = new Keyboard(keys /*write*/)
 
   const canvasObj = new Canvas(canvas /*write*/)
 
@@ -60,7 +103,8 @@ export function main() {
 
   // ---
 
-  archetypesObj.loadArchetypes()
+  playersLoader.load()
+  rocksLoader.load()
 
   globalThis.addEventListener('keydown', (ev: KeyboardEvent) => {
     keyboard.keydown(ev)
@@ -87,9 +131,13 @@ export function main() {
   })
 
   const update = () => {
-    // ---
     entityInput.update()
-    archetypesObj.updateAll() // Decompose archetypes
+    // ---
+    controllablesObj.updateControllable()
+    pushablesOjb.updatePushable()
+    borderForcer.updateBorderForce()
+    // ---
+    momentObj.updateMoment()
     // ---
     renderer.animate() // <--- shapes borders don't collide ! only inside circle
   }

@@ -23,7 +23,8 @@ export class RocksLoader {
 
     // 60fps at 1100 after ~10s
     // 28-32fps at 2500 after ~10s
-    for (let i = 0; i < 100; i++) {
+    const n = 100
+    for (let i = 0; i < n; i++) {
       this.rocks.position[i] = {
         x: 1920 * Math.random(),
         y: 1080 * Math.random(),

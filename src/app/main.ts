@@ -1,6 +1,6 @@
 import { Keyboard } from './keyboard.ts'
 import { Canvas } from './canvas.ts'
-import { Renderer } from './renderer.ts'
+import { BackgroundRenderer } from './renderer.ts'
 import { Animator } from './animator.ts'
 import { EntityInputs } from './entityinputs.ts'
 import { ControllableArch } from './controllablearch.ts'
@@ -9,25 +9,44 @@ import { BorderForce } from './borderforce.ts'
 import { MomentArch } from './momentarch.ts'
 import { PlayersLoader } from './playersloader.ts'
 import { RocksLoader } from './rocksloader.ts'
+import { VirtualCanvas } from './virtualcanvas.ts'
+import { RocksRenderer } from './rocksrenderer.ts'
+import { PlayersRenderer } from './playerrenderer.ts'
+
+type Moment = { x: number; y: number }
+type Position = { x: number; y: number }
+type Radius = number
+type Deceleration = number
+type Speed = number
+type Controls = { up: boolean; down: boolean; left: boolean; right: boolean }
 
 type ArchetypesData = {
   players: {
-    controls: { up: boolean; down: boolean; left: boolean; right: boolean }[] // remove from here ?
-    deceleration: number[]
-    moment: { x: number; y: number }[]
-    position: { x: number; y: number }[]
-    radius: number[]
-    speed: number[]
+    controls: Controls[] // remove from here ?
+    deceleration: Deceleration[]
+    moment: Moment[]
+    position: Position[]
+    radius: Radius[]
+    speed: Speed[]
   }
   rocks: {
-    deceleration: number[]
-    moment: { x: number; y: number }[]
-    position: { x: number; y: number }[]
-    radius: number[]
+    deceleration: Deceleration[]
+    moment: Moment[]
+    position: Position[]
+    radius: Radius[]
   }
 }
 
+type VCanvasData = {
+  x: number
+  y: number
+  width: number
+  height: number
+  scale: number
+}
+
 export function main() {
+  // Server data
   const archetypes: ArchetypesData = {
     players: {
       controls: [],
@@ -45,10 +64,21 @@ export function main() {
     },
   }
 
+  // ---
+  // Client data
+
   const keys: Record<string, boolean> = {}
 
   const canvas = globalThis.document.createElement('canvas')
   const ctx = canvas.getContext('2d')!
+
+  const vCanvasData: VCanvasData = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    scale: 0,
+  }
 
   // ---
 
@@ -59,39 +89,37 @@ export function main() {
 
   const controllablesObj = new ControllableArch(
     archetypes.players.controls /*read*/,
-    archetypes.players.moment /*~read write*/,
+    archetypes.players.moment /*write*/,
     archetypes.players.speed /*read*/
   )
 
   const pushablesOjb = new PushableArch(
-    archetypes.players.moment /*~read write*/,
+    archetypes.players.moment /*write*/,
     archetypes.players.position /*read*/,
     archetypes.players.radius /*read*/,
-    archetypes.rocks.moment /*~read write*/,
+    archetypes.rocks.moment /*write*/,
     archetypes.rocks.position /*read*/,
     archetypes.rocks.radius /*read*/
   )
 
-  const borderForcer = new BorderForce(
+  const borderForce = new BorderForce(
     archetypes.players.position /*read*/,
     archetypes.rocks.position /*read*/,
-    archetypes.players.moment /*~read write*/,
-    archetypes.rocks.moment /*~read write*/
+    archetypes.players.moment /*write*/,
+    archetypes.rocks.moment /*write*/
   )
 
   const momentObj = new MomentArch(
     archetypes.players.position /*read*/,
-    archetypes.players.moment /*~read write*/,
+    archetypes.players.moment /*write*/,
     archetypes.players.deceleration /*read*/,
     archetypes.rocks.position /*read*/,
-    archetypes.rocks.moment /*~read write*/,
+    archetypes.rocks.moment /*write*/,
     archetypes.rocks.deceleration /*read*/
   )
 
   const playersLoader = new PlayersLoader(archetypes.players /*write*/)
   const rocksLoader = new RocksLoader(archetypes.rocks /*write*/)
-
-  // const archetypesObj = new ArchetypesClass(archetypes) // Decompose archetypes
 
   // ---
 
@@ -99,7 +127,17 @@ export function main() {
 
   const canvasObj = new Canvas(canvas /*write*/)
 
-  const renderer = new Renderer(ctx, archetypes)
+  const virtualCanvas = new VirtualCanvas(ctx /*read*/, vCanvasData /*write*/)
+
+  const bgRenderer = new BackgroundRenderer(ctx /*write*/, vCanvasData /*read*/)
+
+  const rocksRenderer = new RocksRenderer(ctx, archetypes.rocks, vCanvasData)
+
+  const playersRenderer = new PlayersRenderer(
+    ctx,
+    archetypes.players,
+    vCanvasData
+  )
 
   // ---
 
@@ -107,19 +145,21 @@ export function main() {
   rocksLoader.load()
 
   globalThis.addEventListener('keydown', (ev: KeyboardEvent) => {
-    keyboard.keydown(ev)
+    keyboard.keydown(ev /*read*/)
   })
 
   globalThis.addEventListener('keyup', (ev: KeyboardEvent) => {
-    keyboard.keyup(ev)
+    keyboard.keyup(ev /*read*/)
   })
 
   // ---
 
   canvasObj.resizeToScreen()
+  virtualCanvas.resize()
 
   globalThis.addEventListener('resize', (ev: UIEvent) => {
     canvasObj.resizeToScreen()
+    virtualCanvas.resize()
   })
 
   globalThis.visualViewport!.addEventListener('resize', (ev: Event) => {
@@ -135,11 +175,13 @@ export function main() {
     // ---
     controllablesObj.updateControllable()
     pushablesOjb.updatePushable()
-    borderForcer.updateBorderForce()
+    borderForce.updateBorderForce()
     // ---
     momentObj.updateMoment()
     // ---
-    renderer.animate() // <--- shapes borders don't collide ! only inside circle
+    bgRenderer.draw()
+    rocksRenderer.draw()
+    playersRenderer.draw()
   }
   const animator = new Animator(update)
   globalThis.requestAnimationFrame((time: DOMHighResTimeStamp) => {

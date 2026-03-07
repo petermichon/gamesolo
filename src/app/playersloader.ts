@@ -34,7 +34,7 @@ export class PlayersLoader {
       const x = 1920 / 2 + i * 100
       const y = 1080 / 2
       this.players.position[i] = { x, y }
-      this.players.radius[i] = 29 // 29
+      this.players.radius[i] = 30 // 30 37
       this.players.speed[i] = 1.5 // 1.5 4.5 6.0
     }
   }
